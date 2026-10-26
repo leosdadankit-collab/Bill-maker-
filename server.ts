@@ -17,7 +17,7 @@ app.use(express.json({ limit: '10mb' }));
 
 const apiKey = process.env.GEMINI_API_KEY;
 let aiClient: GoogleGenAI | null = null;
-if (apiKey && apiKey !== 'MY_GEMINI_API_KEY' && apiKey.trim().length > 0) {
+if (apiKey && apiKey !== 'AQ.Ab8RN6JfBN0P-LTTNijXIjji5QMZEgyl5pFWcqwcXRusaCTECA' && apiKey.trim().length > 0) {
   try {
     aiClient = new GoogleGenAI({ apiKey });
   } catch (err) {
