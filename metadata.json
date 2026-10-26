@@ -1,0 +1,6 @@
+{
+  "name": "AI Voice & Text Invoice Maker",
+  "description": "Smart AI-powered voice and text invoice maker for Indian businesses with GST calculations, UPI payment QR codes, and PDF export.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -1,0 +1,565 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Voice & Text Invoice Maker | GST & UPI Ready</title>
+    <meta name="description" content="Smart AI-powered voice and text invoice maker for Indian businesses with GST calculations, UPI payment QR codes, and PDF export." />
+    <meta property="og:title" content="AI Voice & Text Invoice Maker | GST & UPI Ready" />
+    <meta property="og:description" content="Smart AI-powered voice and text invoice maker for Indian businesses with GST calculations, UPI payment QR codes, and PDF export." />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <!-- CDN Libraries: QRCode.js & html2pdf.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    
+    <!-- Top App Navigation -->
+    <header class="app-header">
+      <div class="header-container">
+        <div class="brand-wrapper">
+          <div class="brand-logo-badge">₹</div>
+          <div class="brand-title-wrap">
+            <div class="brand-title-row">
+              <h1>AI Voice Invoice Maker</h1>
+              <span class="badge-tag">GST &amp; UPI</span>
+            </div>
+            <span class="brand-subtitle">Natural Speech &bull; Instant GST Calculation &bull; Real PDF &amp; UPI QR</span>
+          </div>
+        </div>
+
+        <div class="header-actions">
+          <!-- Mobile tab switcher -->
+          <div class="mobile-tabs" role="tablist">
+            <button id="mobileTabChat" class="mobile-tab-btn active" role="tab" aria-selected="true">
+              AI Voice &amp; Chat
+            </button>
+            <button id="mobileTabInvoice" class="mobile-tab-btn" role="tab" aria-selected="false">
+              Invoice Preview
+            </button>
+          </div>
+
+          <button id="btnOpenSellerSettings" class="btn btn-secondary" title="Configure your Business Profile &amp; UPI ID">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+            <span>Business Profile</span>
+          </button>
+
+          <button id="btnNewInvoice" class="btn btn-secondary" title="Start a fresh invoice">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+            <span>New Invoice</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Workspace -->
+    <main class="main-layout">
+      
+      <!-- LEFT: Chat & Voice Assistant Panel -->
+      <section id="chatPanel" class="assistant-panel">
+        
+        <!-- Assistant Top Bar -->
+        <div class="assistant-header">
+          <div class="assistant-status">
+            <div class="pulse-dot"></div>
+            <div>
+              <div class="assistant-title">AI Billing Assistant</div>
+              <div class="assistant-subtitle">Speak or type naturally in English, Hindi, Hinglish</div>
+            </div>
+          </div>
+
+          <div class="lang-selector-wrap">
+            <label for="voiceLangSelect">Lang:</label>
+            <select id="voiceLangSelect" class="lang-select">
+              <option value="en-IN">English (India)</option>
+              <option value="hi-IN">Hindi (हिन्दी)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Voice Banner / Active Indicator -->
+        <div id="voiceStatusBanner" class="voice-banner hidden">
+          <div class="voice-recording-indicator">
+            <div class="rec-dot"></div>
+            <span id="voiceStatusText">Listening... Speak now</span>
+          </div>
+          <button id="btnCancelVoice" class="btn-cancel-voice">Cancel</button>
+        </div>
+
+        <!-- Chat Conversation Messages -->
+        <div id="chatMessages" class="chat-container">
+          <!-- Initial Assistant Greeting -->
+          <div class="chat-msg assistant">
+            <div class="assistant-badge">
+              <svg fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a8 8 0 100 16 8 8 0 000-16zm1 11H9v-2h2v2zm0-4H9V5h2v4z"></path></svg>
+              <span>Smart Voice Assistant</span>
+            </div>
+            <p>Welcome! You can create or modify invoices by speaking or typing naturally.</p>
+            <div class="example-quote">
+              "Make an invoice for Rahul Sharma for 5 shirts at ₹500 each, give him a 10% discount, and charge 5% GST."
+            </div>
+            <p style="font-size: 11px; color: var(--slate-500); margin-top: 6px;">
+              Try one of the quick chips below, or tap the microphone to talk:
+            </p>
+          </div>
+        </div>
+
+        <!-- Quick Prompts Carousel -->
+        <div class="quick-prompts-bar">
+          <span class="quick-prompt-label">Quick:</span>
+          <button class="chip-btn quick-prompt-btn" data-prompt="Make an invoice for Rahul Sharma for 5 shirts at ₹500 each, give him a 10% discount, and charge 5% GST.">
+            Rahul Sharma: 5 Shirts @ ₹500, 10% off, 5% GST
+          </button>
+          <button class="chip-btn quick-prompt-btn" data-prompt="Invoice for Priya Patel: 2 Designer Sarees at ₹2500 each, 12% GST.">
+            Priya Patel: 2 Sarees @ ₹2500, 12% GST
+          </button>
+          <button class="chip-btn quick-prompt-btn" data-prompt="Add 2 Blue Jeans at ₹1200 each.">
+            + Add 2 Jeans @ ₹1200
+          </button>
+          <button class="chip-btn quick-prompt-btn" data-prompt="Apply 15% discount on all items.">
+            Apply 15% discount
+          </button>
+          <button class="chip-btn quick-prompt-btn" data-prompt="Customer is in Bengaluru, Karnataka. Switch to Inter-State IGST.">
+            Switch to Inter-State IGST
+          </button>
+        </div>
+
+        <!-- Input Bar (Speech & Text) -->
+        <div class="chat-input-bar">
+          <form id="chatForm">
+            <!-- Review voice transcript before sending -->
+            <div id="voiceReviewNotice" class="voice-review-box hidden">
+              <span>Speech transcribed. Review &amp; edit text before sending:</span>
+              <button type="button" id="btnClearVoiceDraft" class="btn-close-notice">&times;</button>
+            </div>
+
+            <div class="input-row">
+              <!-- Microphone Button -->
+              <button type="button" id="btnMic" class="btn-mic" title="Tap to Speak (Voice Recognition)" aria-label="Start voice recognition">
+                <svg id="micIconNormal" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path></svg>
+                <div id="micWaveAnim" class="mic-wave" style="display: none;">
+                  <span class="wave-bar"></span>
+                  <span class="wave-bar"></span>
+                  <span class="wave-bar"></span>
+                </div>
+              </button>
+
+              <!-- Text Input -->
+              <input type="text" id="chatInput" placeholder="Speak or type instructions (e.g. 5 shirts at ₹500, 10% discount)..." class="text-input" autocomplete="off" />
+
+              <!-- Send Button -->
+              <button type="submit" id="btnSend" class="btn-send" aria-label="Send instruction">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+              </button>
+            </div>
+          </form>
+        </div>
+
+      </section>
+
+      <!-- RIGHT: Printable Live Invoice Preview & Actions -->
+      <section id="invoicePanel" class="invoice-panel">
+        
+        <!-- Toolbar Action Bar -->
+        <div class="toolbar-card">
+          <div class="toolbar-status">
+            <div class="status-dot"></div>
+            <span class="status-text">Printable Invoice Preview</span>
+            <span id="taxModeBadge" class="tax-badge">Intra-State (CGST + SGST)</span>
+          </div>
+
+          <div class="toolbar-buttons">
+            <button id="btnEditInvoiceModal" class="btn btn-secondary" title="Manually edit any invoice field">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+              <span>Edit Invoice</span>
+            </button>
+
+            <button id="btnOpenUpiModal" class="btn btn-accent" title="View or test live UPI payment QR">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path></svg>
+              <span>UPI QR</span>
+            </button>
+
+            <button id="btnPrintInvoice" class="btn btn-secondary" title="Print invoice using browser print dialog">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+              <span>Print</span>
+            </button>
+
+            <button id="btnDownloadPdf" class="btn btn-primary" title="Export as clean A4 PDF">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+              <span>Download PDF</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- The Printable A4 Invoice Container (matching user reference image) -->
+        <div id="invoicePrintWrapper" class="invoice-print-container">
+          <article id="invoiceDocument" class="invoice-sheet">
+            
+            <!-- Header Row: Seller details (left) & INVOICE title (right) -->
+            <div class="invoice-header-row">
+              <div class="seller-info">
+                <div id="invSellerName" class="seller-name">Apex Retail &amp; Apparel</div>
+                <div id="invSellerAddress" class="seller-address">Shop 12, Connaught Place, New Delhi, Delhi - 110001</div>
+                <div class="seller-contact">
+                  <span id="invSellerPhone">+91 98765 43210</span> &bull; <span id="invSellerEmail">apexretail@gmail.com</span>
+                </div>
+                <div id="invSellerGstinRow" class="seller-gstin">
+                  GSTIN: <span id="invSellerGstin">07AAAAA0000A1Z5</span>
+                </div>
+              </div>
+
+              <div class="invoice-main-title">
+                INVOICE
+              </div>
+            </div>
+
+            <!-- Invoice Meta: Number & Date -->
+            <div class="invoice-meta-row">
+              <div>
+                <span class="meta-label">Invoice Number:</span>
+                <span id="invNumber" class="meta-val">#INV-2026-001</span>
+              </div>
+              <div>
+                <span class="meta-label">Date:</span>
+                <span id="invDate" class="meta-val">26/10/2026</span>
+              </div>
+            </div>
+
+            <!-- BILL TO Box with Grey Header Bar -->
+            <div class="bill-to-box">
+              <div class="section-bar">BILL TO</div>
+              <div class="bill-to-content">
+                <div id="invCustomerName" class="customer-name">Rahul Sharma</div>
+                <div id="invCustomerAddress" class="customer-address">Sector 14, Gurugram, Haryana - 122001</div>
+                <div class="customer-contact-row">
+                  <div>Phone: <span id="invCustomerPhone">+91 98111 22334</span></div>
+                  <div>Email: <span id="invCustomerEmail">rahul.sharma@example.com</span></div>
+                  <div id="invCustomerGstinRow" class="customer-gstin">GSTIN: <span id="invCustomerGstin">06ABCDE1234F1Z8</span></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Products or Services Table with Grey Header Bar -->
+            <div class="products-box">
+              <div class="section-bar">Products or Services</div>
+              
+              <table class="items-table">
+                <thead>
+                  <tr>
+                    <th class="col-desc">Description</th>
+                    <th class="col-price">Unit Price</th>
+                    <th class="col-qty">QTY</th>
+                    <th class="col-disc">Disc %</th>
+                    <th class="col-amount">Amount</th>
+                  </tr>
+                </thead>
+                <tbody id="invoiceTableBody">
+                  <!-- Injected via script.js -->
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Bottom Row: Notes & UPI QR (Left) and Detailed Totals (Right) -->
+            <div class="invoice-bottom-row">
+              
+              <!-- Left: Notes & UPI Instant Payment Card -->
+              <div class="notes-and-payment">
+                
+                <!-- NOTES Box -->
+                <div class="notes-box">
+                  <div class="notes-title">NOTES:</div>
+                  <div id="invNotes" class="notes-content">
+                    Thank you for your business! Payment is requested within 15 days. Please scan the UPI QR code below for instant payment.
+                  </div>
+                </div>
+
+                <!-- Real Scannable UPI Payment Box -->
+                <div id="upiPaymentCard" class="upi-payment-block">
+                  <div class="upi-qr-frame">
+                    <div id="qrcodeCanvas"></div>
+                  </div>
+                  <div class="upi-info">
+                    <div class="upi-badge-header">
+                      <span class="upi-dot"></span>
+                      <span>Instant UPI Payment</span>
+                    </div>
+                    <div style="color: #475569;">Scan via Google Pay, PhonePe, Paytm, BHIM</div>
+                    <div class="upi-id-line">UPI ID: <span id="invUpiIdText">apexretail@okhdfcbank</span></div>
+                    <div class="upi-amount-line">Amount: <span id="invUpiAmountText">₹2,363.00</span></div>
+                  </div>
+                </div>
+
+              </div>
+
+              <!-- Right: Totals Box -->
+              <div class="totals-box">
+                <div class="totals-row">
+                  <span>Sub Total:</span>
+                  <span id="totSubTotal" class="totals-val">₹2,500.00</span>
+                </div>
+
+                <div class="totals-row">
+                  <span>Discount:</span>
+                  <span id="totDiscount" class="totals-val">- ₹250.00</span>
+                </div>
+
+                <div class="totals-row divider">
+                  <span>Taxable Value:</span>
+                  <span id="totTaxable" class="totals-val">₹2,250.00</span>
+                </div>
+
+                <!-- GST Rows -->
+                <div id="cgstRow" class="totals-row">
+                  <span id="cgstLabel">CGST:</span>
+                  <span id="totCgst" class="totals-val">₹56.25</span>
+                </div>
+
+                <div id="sgstRow" class="totals-row">
+                  <span id="sgstLabel">SGST:</span>
+                  <span id="totSgst" class="totals-val">₹56.25</span>
+                </div>
+
+                <div id="igstRow" class="totals-row" style="display: none;">
+                  <span id="igstLabel">IGST:</span>
+                  <span id="totIgst" class="totals-val">₹0.00</span>
+                </div>
+
+                <div id="roundOffRow" class="totals-row" style="font-size: 11px; color: #64748b;">
+                  <span>Round Off:</span>
+                  <span id="totRoundOff" class="totals-val">+ ₹0.50</span>
+                </div>
+
+                <!-- GRAND TOTAL -->
+                <div class="totals-row grand-total">
+                  <span>GRAND TOTAL:</span>
+                  <span id="totGrandTotal" class="totals-val">₹2,363.00</span>
+                </div>
+
+                <!-- Paid & Balance Due -->
+                <div id="balanceDueContainer" class="payment-status-section">
+                  <div class="totals-row">
+                    <span>Amount Paid:</span>
+                    <span id="totPaid" class="totals-val">₹0.00</span>
+                  </div>
+                  <div class="totals-row" style="font-weight: 700; color: #0f172a;">
+                    <span>Balance Due:</span>
+                    <span id="totBalanceDue" class="totals-val">₹2,363.00</span>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Bottom Center Banner (matching reference image) -->
+            <div class="thank-you-banner">
+              Thank You for your Business!
+            </div>
+
+            <div class="invoice-disclaimer">
+              Generated digitally. Tax calculations follow standard Indian GST intra/inter-state guidelines. Verify invoice details prior to filing.
+            </div>
+
+          </article>
+        </div>
+
+      </section>
+
+    </main>
+
+    <!-- MODAL 1: Business Profile Settings -->
+    <div id="modalSellerSettings" class="modal-overlay hidden">
+      <div class="modal-window">
+        <div class="modal-header">
+          <div class="modal-title-row">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+            <span>Business Profile &amp; UPI Settings</span>
+          </div>
+          <button id="btnCloseSellerSettings" class="modal-close-btn">&times;</button>
+        </div>
+
+        <form id="sellerSettingsForm">
+          <div class="modal-body">
+            <div class="form-group">
+              <label class="form-label">Business / Seller Name *</label>
+              <input type="text" id="setSellerName" required class="form-control" />
+            </div>
+
+            <div class="grid-2">
+              <div class="form-group">
+                <label class="form-label">Phone Number</label>
+                <input type="text" id="setSellerPhone" class="form-control" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Email Address</label>
+                <input type="email" id="setSellerEmail" class="form-control" />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Business Address</label>
+              <textarea id="setSellerAddress" rows="2" class="form-control"></textarea>
+            </div>
+
+            <div class="grid-2">
+              <div class="form-group">
+                <label class="form-label">Seller State</label>
+                <input type="text" id="setSellerState" placeholder="e.g. Delhi, Maharashtra" class="form-control" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">GSTIN (Optional)</label>
+                <input type="text" id="setSellerGstin" placeholder="15-digit GSTIN" class="form-control" style="font-family: monospace; text-transform: uppercase;" />
+              </div>
+            </div>
+
+            <div class="form-group" style="background-color: #f5f7ff; padding: 12px; border: 1px solid #c7d2fe; border-radius: 6px;">
+              <label class="form-label" style="color: #312e81;">UPI ID for Scannable QR Code *</label>
+              <input type="text" id="setSellerUpi" required placeholder="e.g. apexretail@okhdfcbank" class="form-control" style="font-family: monospace;" />
+              <span style="font-size: 11px; color: #4338ca; margin-top: 4px;">A live, scannable UPI QR code will be dynamically generated on every invoice for instant payments.</span>
+            </div>
+
+            <div class="modal-footer">
+              <button type="button" id="btnCancelSellerSettings" class="btn btn-secondary">Cancel</button>
+              <button type="submit" class="btn btn-primary">Save Profile</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- MODAL 2: Manual Edit Invoice -->
+    <div id="modalEditInvoice" class="modal-overlay hidden">
+      <div class="modal-window wide">
+        <div class="modal-header">
+          <div class="modal-title-row">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+            <span>Edit Invoice Fields</span>
+          </div>
+          <button id="btnCloseEditInvoice" class="modal-close-btn">&times;</button>
+        </div>
+
+        <form id="editInvoiceForm">
+          <div class="modal-body">
+            <!-- Meta Row -->
+            <div class="grid-3">
+              <div class="form-group">
+                <label class="form-label">Invoice Number</label>
+                <input type="text" id="editInvNumber" required class="form-control" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Invoice Date</label>
+                <input type="date" id="editInvDate" required class="form-control" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">GST Tax Treatment</label>
+                <select id="editTaxType" class="form-control">
+                  <option value="intra">Intra-State (CGST + SGST)</option>
+                  <option value="inter">Inter-State (IGST)</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Customer Details -->
+            <div style="background-color: #f8fafc; border: 1px solid #cbd5e1; border-radius: 6px; padding: 12px; display: flex; flex-direction: column; gap: 8px;">
+              <div style="font-weight: 700; font-size: 11px; text-transform: uppercase; color: #334155;">Customer / Bill To Details</div>
+              <div class="grid-2">
+                <div class="form-group">
+                  <label class="form-label">Customer Name *</label>
+                  <input type="text" id="editCustName" required class="form-control" />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Phone Number</label>
+                  <input type="text" id="editCustPhone" class="form-control" />
+                </div>
+              </div>
+              <div class="grid-2">
+                <div class="form-group">
+                  <label class="form-label">Email</label>
+                  <input type="email" id="editCustEmail" class="form-control" />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Customer GSTIN (Optional)</label>
+                  <input type="text" id="editCustGstin" class="form-control" style="font-family: monospace; text-transform: uppercase;" />
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Billing Address</label>
+                <input type="text" id="editCustAddress" class="form-control" />
+              </div>
+            </div>
+
+            <!-- Items -->
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-weight: 700; font-size: 11px; text-transform: uppercase; color: #334155;">Products / Services</span>
+                <button type="button" id="btnAddItemRow" class="btn btn-accent" style="padding: 4px 10px; font-size: 11px;">+ Add Item</button>
+              </div>
+
+              <div id="editItemsList" style="display: flex; flex-direction: column; gap: 6px;">
+                <!-- Populated dynamically -->
+              </div>
+            </div>
+
+            <!-- Notes & Charges -->
+            <div class="grid-2">
+              <div class="form-group">
+                <label class="form-label">Invoice Notes</label>
+                <textarea id="editInvNotes" rows="2" class="form-control"></textarea>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 8px;">
+                <div class="form-group">
+                  <label class="form-label">Amount Paid (₹)</label>
+                  <input type="number" id="editAmountPaid" min="0" step="0.01" class="form-control" />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Additional Charges / Shipping (₹)</label>
+                  <input type="number" id="editAdditionalCharges" min="0" step="0.01" class="form-control" />
+                </div>
+              </div>
+            </div>
+
+            <div class="modal-footer">
+              <button type="button" id="btnCancelEditInvoice" class="btn btn-secondary">Cancel</button>
+              <button type="submit" class="btn btn-primary">Update Invoice</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- MODAL 3: UPI Payment Preview & QR -->
+    <div id="modalUpiPayment" class="modal-overlay hidden">
+      <div class="modal-window" style="max-width: 380px; text-align: center; padding: 24px;">
+        <div style="width: 48px; height: 48px; border-radius: 50%; background-color: var(--success-light); color: var(--success); display: flex; align-items: center; justify-content: center; margin: 0 auto 12px;">
+          <svg style="width: 24px; height: 24px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path></svg>
+        </div>
+        <h3 style="font-size: 18px; font-weight: 700; color: #0f172a; margin-bottom: 4px;">Scan &amp; Pay via UPI</h3>
+        <p style="font-size: 12px; color: #64748b; margin-bottom: 16px;">Works with GPay, PhonePe, Paytm, BHIM &amp; all UPI apps</p>
+
+        <div style="background-color: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 12px; display: inline-block; margin-bottom: 16px;">
+          <div id="modalQrcodeCanvas"></div>
+        </div>
+
+        <div style="margin-bottom: 16px;">
+          <div id="modalUpiAmount" style="font-size: 20px; font-weight: 800; color: #0f172a;">₹2,363.00</div>
+          <div id="modalUpiId" style="font-size: 12px; font-family: monospace; color: #4338ca; font-weight: 600;">apexretail@okhdfcbank</div>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          <a id="btnDirectUpiPay" href="#" class="btn btn-primary" style="width: 100%; padding: 10px;">
+            Open in UPI App (Mobile Only)
+          </a>
+          <button id="btnCloseUpiModal" class="btn btn-secondary" style="width: 100%;">
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Application Script -->
+    <script src="./script.js"></script>
+  </body>
+</html>
